@@ -41,3 +41,5 @@ def search_executives(company_siren: str) -> ResultContract:
         ))
         
     return contract
+
+
