@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHAMBER — Executive & Officer Network</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-color: #ec4899;
+            --accent-hover: #db2777;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 2rem;
+            background-image: radial-gradient(circle at 10% 90%, rgba(236, 72, 153, 0.08) 0%, transparent 40%);
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .logo-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .logo-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 0.75rem;
+            background: var(--card-bg);
+            padding: 0.5rem;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            max-width: 700px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+        }
+
+        .search-box button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .exec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .exec-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .exec-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(236, 72, 153, 0.2);
+            color: #f472b6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .exec-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .exec-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .mandate-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .mandate-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .mandate-role {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #f472b6;
+        }
+
+        .mandate-company {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(236, 72, 153, 0.15);
+            color: #f472b6;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">C</div>
+            <div>
+                <div class="logo-title">CHAMBER</div>
+                <div class="logo-subtitle">Réseau des Dirigeants & Mandats Social</div>
+            </div>
+        </div>
+        <div class="badge">V1.0.0 — BODACC CONNECTED</div>
+    </header>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Entrez un nom d'entreprise ou SIREN (ex: Airbus, Total, 383474814)..." value="Airbus">
+        <button onclick="chercherDirigeants()">Rechercher Dirigeants</button>
+    </div>
+
+    <div class="exec-grid" id="execGrid"></div>
+
+    <script>
+        async function chercherDirigeants() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            try {
+                const response = await fetch(`/api/v1/executives/${encodeURIComponent(query)}`);
+                const contract = await response.json();
+                const executives = contract.result.executives || [];
+
+                const grid = document.getElementById('execGrid');
+                grid.innerHTML = '';
+
+                executives.forEach(exec => {
+                    const initials = exec.full_name.split(' ').map(n => n[0]).join('');
+                    const card = document.createElement('div');
+                    card.className = 'exec-card';
+
+                    let rolesHtml = '';
+                    (exec.roles || []).forEach(r => {
+                        rolesHtml += `
+                            <div class="mandate-item">
+                                <div class="mandate-role">${r.title}</div>
+                                <div class="mandate-company">${r.company_name} (SIREN: ${r.company_siren}) — Depuis ${r.start_date || 'N/C'}</div>
+                            </div>
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <div class="exec-header">
+                            <div class="avatar">${initials}</div>
+                            <div>
+                                <div class="exec-name">${exec.full_name}</div>
+                                <div class="exec-meta">Nationalité: ${exec.nationality || 'Française'} | Né(e) en ${exec.birth_year || 'N/C'}</div>
+                            </div>
+                        </div>
+                        <div class="mandate-list">
+                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.25rem;">Mandats Déclarés</div>
+                            ${rolesHtml}
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+            } catch (err) {
+                alert("Erreur lors de la recherche des dirigeants.");
+            }
+        }
+
+        window.onload = chercherDirigeants;
+    </script>
+</body>
+</html>
